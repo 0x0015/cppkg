@@ -4,7 +4,7 @@
 nlohmann::json project::serialize() const{
 	nlohmann::json output{};
 	output["name"] = name;
-	output["type"] = std::array<std::string_view, 2>{{"library", "executable"}}[(unsigned int)type];
+	output["type"] = std::array<std::string_view, 3>{{"library", "executable", "library_external"}}[(unsigned int)type];
 	output["binName"] = binName;
 	output["version"] = version;
 
@@ -33,6 +33,15 @@ nlohmann::json project::serialize() const{
 	if(!customCommands.empty())
 		output["customCommands"] = customCommands;
 
+	if(!prebuildCommands.empty())
+		output["prebuildCommands"] = prebuildCommands;
+
+	if(!postbuildCommands.empty())
+		output["postbuildCommands"] = postbuildCommands;
+
+	if(!extraCleanCommands.empty())
+		output["extraCleanCommands"] = extraCleanCommands;
+
 	return output;
 }
 
@@ -43,8 +52,10 @@ void project::deserialize(const nlohmann::json& j){
 		const std::string& typestr = j["type"];
 		if(typestr == "library" || typestr == "lib")
 			type = LIBRARY;
-		if(typestr == "executable" || typestr == "exe")
+		else if(typestr == "executable" || typestr == "exe")
 			type = EXECUTABLE;
+		else if(typestr == "library_external")
+			type = LIBRARY_EXTERNAL;
 		else
 			std::cerr<<"Error: unknown type \""<<typestr<<"\". Please specify either \"library\" or \"executable\""<<std::endl;
 	}
@@ -67,6 +78,9 @@ void project::deserialize(const nlohmann::json& j){
 	}
 	trySetVal(j, "deps", deps);
 	trySetVal(j, "customCommands", customCommands);
+	trySetVal(j, "prebuildCommands", prebuildCommands);
+	trySetVal(j, "postbuildCommands", postbuildCommands);
+	trySetVal(j, "extraCleanCommands", extraCleanCommands);
 }
 
 void project::init_default(){

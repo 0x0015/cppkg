@@ -9,7 +9,8 @@ public:
 	std::string name;
 	enum projec_type{
 		LIBRARY = 0,
-		EXECUTABLE = 1
+		EXECUTABLE = 1,
+		LIBRARY_EXTERNAL = 2
 	} type;
 	std::string binName;
 	std::string version;
@@ -23,6 +24,8 @@ public:
 	compOptions release_extra;
 	std::vector<std::string> deps;
 	std::unordered_map<std::string, std::string> customCommands;
+	std::vector<std::string> prebuildCommands, postbuildCommands;
+	std::vector<std::string> extraCleanCommands;
 	nlohmann::json serialize() const override;
 	void deserialize(const nlohmann::json& j) override;
 	void init_default();

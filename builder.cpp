@@ -15,6 +15,11 @@ bool pathContainsDirectory(const std::filesystem::path& p, const std::string& di
 }
 
 bool builder::build(){
+	if(proj.type == project::LIBRARY_EXTERNAL){
+		std::cout<<"Type is library external, so skipping build"<<std::endl;
+		return true;
+	}
+
 	auto buildPath = getTempPath("build");
 	auto src_path = buildPath / "src";
 	if(!std::filesystem::exists(src_path))

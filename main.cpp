@@ -51,6 +51,12 @@ int main(int argc, char** argv){
 		}
 		project proj;
 		proj.deserializeFromFile("project.json");
+		
+		for(const auto& prebuildCmd : proj.prebuildCommands){
+			std::cout<<"Command $ "<<prebuildCmd<<std::endl;
+			system(prebuildCmd.c_str());
+		}
+
 		depMan deps(proj);
 		if(!deps.resolveDeps()){
 			std::cerr<<"Error: Failed to resolve dependencies"<<std::endl;
@@ -65,6 +71,12 @@ int main(int argc, char** argv){
 			std::cerr<<"Error: Build failed"<<std::endl;
 			return(1);
 		}
+
+		for(const auto& postbuildCmd : proj.postbuildCommands){
+			std::cout<<"Command $ "<<postbuildCmd<<std::endl;
+			system(postbuildCmd.c_str());
+		}
+
 		return(0);
 	}else if(argc == 2 && std::string_view(argv[1]) == "clean"){
 		if(!std::filesystem::exists("project.json")){
@@ -73,13 +85,23 @@ int main(int argc, char** argv){
 		}
 		project proj;
 		proj.deserializeFromFile("project.json");
-		if(std::filesystem::exists(proj.binName))
-			std::filesystem::remove(proj.binName);
+		if(proj.type == project::EXECUTABLE){
+			if(std::filesystem::exists(proj.binName))
+				std::filesystem::remove(proj.binName);
+		}else{
+			if(std::filesystem::exists(proj.binName + ".so"))
+				std::filesystem::remove(proj.binName + ".so");
+		}
 		if(std::filesystem::exists("_cppkg"))
 			std::filesystem::remove_all("_cppkg");
+
+		for(const auto& cleanCmd : proj.extraCleanCommands){
+			std::cout<<"Command $ "<<cleanCmd<<std::endl;
+			system(cleanCmd.c_str());
+		}
 	}else{
 		const auto printHelp = [](){
-			std::cout<<"cppkg Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\thelp (or anything else) - print this message"<<std::endl;
+			std::cout<<"cppkg v0.0.1 Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\thelp (or anything else) - print this message"<<std::endl;
 			exit(0);
 		};
 		if(argc == 2 && std::filesystem::exists("project.json")){
