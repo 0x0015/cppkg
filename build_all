@@ -1,0 +1,25 @@
+#!/bin/sh
+exec clang-repl --Xcc=-std=c++20 "$(tail -n +3 "$0")"
+
+#include <iostream>
+#include <filesystem>
+
+auto cwd = std::filesystem::current_path();
+for(const auto& dir_entry : std::filesystem::directory_iterator{cwd}){
+	if(dir_entry.is_directory()){
+		auto projPath = dir_entry.path();
+		if(projPath.filename().string()[0] == '.')
+			continue;
+		std::filesystem::current_path(projPath);
+		std::cout<<"Cleaning project: "<<projPath.filename().string()<<std::endl;
+		system("cppkg clean");
+		std::cout<<"Building project: "<<projPath.filename().string()<<std::endl;
+		if(system("cppkg build") != 0){
+			std::cerr<<"Build failed"<<std::endl;
+			break;
+		}
+		std::cout<<"Cleaning project (again): "<<projPath.filename().string()<<std::endl;
+		system("cppkg clean");
+	}
+}
+

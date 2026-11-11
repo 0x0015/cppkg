@@ -1,0 +1,30 @@
+{
+	"name": "SDL3",
+	"version": "0.0.1",
+	"type": "library_external",
+	"binName": "libSDL3",
+	"source": [
+		"main.cpp"
+	],
+	"compileFlags": [""],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/libsdl-org/SDL.git"
+	],
+	"postbuildCommands":[
+		"cd SDL;mkdir build;cd build;cmake ..;make -j",
+		"cp SDL/build/libSDL3.so .",
+		"rm -rf -f include",
+		"cp -r SDL/include .",
+		"rm -rf -f SDL"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include"
+	]
+}
