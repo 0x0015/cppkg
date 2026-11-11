@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "json.hpp"
 
 class project : public jsonSerializable{
@@ -21,6 +22,7 @@ public:
 	compOptions debug_extra;
 	compOptions release_extra;
 	std::vector<std::string> deps;
+	std::unordered_map<std::string, std::string> customCommands;
 	nlohmann::json serialize() const override;
 	void deserialize(const nlohmann::json& j) override;
 	void init_default();

@@ -66,7 +66,7 @@ int main(int argc, char** argv){
 			return(1);
 		}
 		return(0);
-	}else if(argc == 2 && std::string_view(argv[1]) == "build"){
+	}else if(argc == 2 && std::string_view(argv[1]) == "clean"){
 		if(!std::filesystem::exists("project.json")){
 			std::cerr<<"Error: no project file in current directory"<<std::endl;
 			return(1);
@@ -78,8 +78,19 @@ int main(int argc, char** argv){
 		if(std::filesystem::exists("_cppkg"))
 			std::filesystem::remove_all("_cppkg");
 	}else{
-		std::cout<<"cppkg Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\thelp (or anything else) - print this message"<<std::endl;
-		return(0);
+		const auto printHelp = [](){
+			std::cout<<"cppkg Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\thelp (or anything else) - print this message"<<std::endl;
+			exit(0);
+		};
+		if(argc == 2 && std::filesystem::exists("project.json")){
+			project proj;
+			proj.deserializeFromFile("project.json");
+			if(!proj.customCommands.contains(std::string(argv[1])))
+				printHelp();
+			std::cout<<"Command $ "<<proj.customCommands.at(std::string(argv[1]))<<std::endl;
+			return system(proj.customCommands.at(std::string(argv[1])).c_str());
+		}else
+			printHelp();
 	}
 }
 

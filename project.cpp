@@ -30,6 +30,9 @@ nlohmann::json project::serialize() const{
 	if(!deps.empty())
 		output["deps"] = deps;
 
+	if(!customCommands.empty())
+		output["customCommands"] = customCommands;
+
 	return output;
 }
 
@@ -63,6 +66,7 @@ void project::deserialize(const nlohmann::json& j){
 		trySetVal(release, "linkFlags", release_extra.linkFlags);
 	}
 	trySetVal(j, "deps", deps);
+	trySetVal(j, "customCommands", customCommands);
 }
 
 void project::init_default(){
