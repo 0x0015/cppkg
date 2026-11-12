@@ -14,10 +14,12 @@ for(const auto& dir_entry : std::filesystem::directory_iterator{cwd}){
 		std::cout<<"Cleaning project: "<<projPath.filename().string()<<std::endl;
 		system("cppkg clean");
 		std::cout<<"Building project: "<<projPath.filename().string()<<std::endl;
-		if(system("cppkg build") != 0){
+		if(system("cppkg build release") != 0){
 			std::cerr<<"Build failed"<<std::endl;
 			break;
 		}
+		std::cout<<"Packaging project: "<<projPath.filename().string()<<std::endl;
+		system("cppkg package");
 		std::cout<<"Cleaning project (again): "<<projPath.filename().string()<<std::endl;
 		system("cppkg clean");
 	}

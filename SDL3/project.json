@@ -1,7 +1,7 @@
 {
 	"name": "SDL3",
 	"version": "0.0.1",
-	"type": "library_external",
+	"type": "library",
 	"binName": "libSDL3",
 	"source": [
 		"main.cpp"
@@ -17,8 +17,8 @@
 	"prebuildCommands":[
 		"git clone --depth 1 https://github.com/libsdl-org/SDL.git"
 	],
+	"externalBuildCommand": "cd SDL;mkdir build;cd build;cmake ..;make -j",
 	"postbuildCommands":[
-		"cd SDL;mkdir build;cd build;cmake ..;make -j",
 		"cp SDL/build/libSDL3.so .",
 		"rm -rf -f include",
 		"cp -r SDL/include .",
