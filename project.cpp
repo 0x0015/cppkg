@@ -4,7 +4,7 @@
 nlohmann::json project::serialize() const{
 	nlohmann::json output{};
 	output["name"] = name;
-	output["type"] = std::array<std::string_view, 3>{{"library", "executable", "library_external"}}[(unsigned int)type];
+	output["type"] = std::array<std::string_view, 2>{{"library", "executable"}}[(unsigned int)type];
 	output["binName"] = binName;
 	output["version"] = version;
 
@@ -42,6 +42,9 @@ nlohmann::json project::serialize() const{
 	if(!extraCleanCommands.empty())
 		output["extraCleanCommands"] = extraCleanCommands;
 
+	if(externalBuildCommand)
+		output["externalBuildCommand"] = *externalBuildCommand;
+
 	return output;
 }
 
@@ -54,8 +57,6 @@ void project::deserialize(const nlohmann::json& j){
 			type = LIBRARY;
 		else if(typestr == "executable" || typestr == "exe")
 			type = EXECUTABLE;
-		else if(typestr == "library_external")
-			type = LIBRARY_EXTERNAL;
 		else
 			std::cerr<<"Error: unknown type \""<<typestr<<"\". Please specify either \"library\" or \"executable\""<<std::endl;
 	}
@@ -81,6 +82,8 @@ void project::deserialize(const nlohmann::json& j){
 	trySetVal(j, "prebuildCommands", prebuildCommands);
 	trySetVal(j, "postbuildCommands", postbuildCommands);
 	trySetVal(j, "extraCleanCommands", extraCleanCommands);
+	if(j.contains("externalBuildCommand"))
+		externalBuildCommand = j["externalBuildCommand"].get<std::string>();
 }
 
 void project::init_default(){

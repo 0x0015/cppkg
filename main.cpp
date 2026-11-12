@@ -76,8 +76,6 @@ int main(int argc, char** argv){
 			std::cout<<"Command $ "<<postbuildCmd<<std::endl;
 			system(postbuildCmd.c_str());
 		}
-
-		return(0);
 	}else if(argc == 2 && std::string_view(argv[1]) == "clean"){
 		if(!std::filesystem::exists("project.json")){
 			std::cerr<<"Error: no project file in current directory"<<std::endl;
@@ -99,9 +97,21 @@ int main(int argc, char** argv){
 			std::cout<<"Command $ "<<cleanCmd<<std::endl;
 			system(cleanCmd.c_str());
 		}
+	}else if(argc == 2 && std::string_view(argv[1]) == "package"){
+		if(!std::filesystem::exists("project.json")){
+			std::cerr<<"Error: no project file in current directory"<<std::endl;
+			return(1);
+		}
+		project proj;
+		proj.deserializeFromFile("project.json");
+		depMan deps(proj);
+		if(!deps.createPackage()){
+			std::cerr<<"Error: failed to create package"<<std::endl;
+			return(1);
+		}
 	}else{
 		const auto printHelp = [](){
-			std::cout<<"cppkg v0.0.1 Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\thelp (or anything else) - print this message"<<std::endl;
+			std::cout<<"cppkg v0.0.2 Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\tpackage - create a package .tar.xz containing the binary and header files\n\thelp (or anything else) - print this message"<<std::endl;
 			exit(0);
 		};
 		if(argc == 2 && std::filesystem::exists("project.json")){

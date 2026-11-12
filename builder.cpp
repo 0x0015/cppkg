@@ -5,18 +5,13 @@
 #include <atomic>
 #include <iostream>
 #include <fstream>
-
-bool pathContainsDirectory(const std::filesystem::path& p, const std::string& dirName){
-	for(const auto& component : p){
-		if(component.string() == dirName)
-			return true;
-	}
-	return false;
-}
+#include <unordered_set>
 
 bool builder::build(){
-	if(proj.type == project::LIBRARY_EXTERNAL){
-		std::cout<<"Type is library external, so skipping build"<<std::endl;
+	if(proj.externalBuildCommand){
+		std::cout<<"External build set, so skipping normal build and running external build command"<<std::endl;
+		std::cout<<"Command $ "<<*proj.externalBuildCommand<<std::endl;
+		system(proj.externalBuildCommand->c_str());
 		return true;
 	}
 
@@ -62,6 +57,24 @@ bool builder::build(){
 		for(const auto& flag : proj.release_extra.linkFlags)
 			linkFlags += " " + flag;
 
+	//technically we need to worry about link order, but let's skip that for now
+	for(const auto& [dep, depProj] : deps.downloadedManifests){
+		auto depPath = getTempPath("pkg") / dep;
+		//add include paths
+		if(std::filesystem::exists(depPath / "include"))//maybe eventually add more cases to detect src, src/include, idk
+			compileFlags += " -I" + (depPath / "include").string();
+		else
+			compileFlags += " -I" + depPath.string();
+
+		if(depProj.type == project::LIBRARY){
+			linkFlags += " -L" + depPath.string();
+			if(depProj.binName.starts_with("lib"))
+				linkFlags += " -l" + depProj.binName.substr(3);
+			else
+				linkFlags += " -l:" + depProj.binName + ".so";
+		}
+	}
+
 	std::string compiler;
 	if(system("g++ --version > /dev/null 2>&1") == 0){
 		compiler = "g++";
@@ -75,6 +88,8 @@ bool builder::build(){
 	if(system("ccache --print-version > /dev/null 2>&1") == 0){
 		std::cout<<"Note: ccache found. Utilizing..."<<std::endl;
 		compiler = "ccache " + compiler;
+	}else{
+		std::cout<<"Note: ccache not found.  It is highly recommended to utilize ccache for repeated compilations"<<std::endl;
 	}
 
 	auto sourceFilesRemaining = proj.norm.sourceFiles;

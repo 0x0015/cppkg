@@ -14,3 +14,11 @@ std::filesystem::path getTempPath(const std::string& subname){
 	return subname_path;
 }
 
+bool pathContainsDirectory(const std::filesystem::path& p, const std::string& dirName){
+	for(const auto& component : p){
+		if(component.string() == dirName)
+			return true;
+	}
+	return false;
+}
+
