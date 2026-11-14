@@ -226,7 +226,8 @@ bool depMan::resolveDeps(){
 		auto depPath = pkgPath / dep;
 		if(!std::filesystem::exists(depPath))
 			std::filesystem::create_directories(depPath);
-		auto downloadStatus = downloadRepoFile(dep + "/" + dep + ".tar.xz", (depPath / (dep + ".tar.xz")).string());
+		auto depPkgFilename = dep + "-" + proj.os.createOsString() + "-" + (proj.mode == minimalProjectInfo::DEBUG ? "debug" : "release") + ".tar.xz";
+		auto downloadStatus = downloadRepoFile(dep + "/" + depPkgFilename, (depPath / depPkgFilename).string());
 		if(downloadStatus){
 			if(*downloadStatus == ALREADY_UP_TO_DATE)
 				std::cout<<"\tUp to Date!"<<std::endl;
@@ -234,7 +235,7 @@ bool depMan::resolveDeps(){
 			std::cerr<<"Error: failed to download project archive for "<<dep<<std::endl;
 			return false;
 		}
-		if(!extract_tar_xz((depPath / (dep + ".tar.xz")).string(), depPath)){
+		if(!extract_tar_xz((depPath / depPkgFilename).string(), depPath)){
 			std::cerr<<"Error: failed to extract project archive for "<<dep<<std::endl;
 			return false;
 		}
@@ -244,25 +245,20 @@ bool depMan::resolveDeps(){
 }
 
 bool depMan::createPackage(){
-	std::string trueBinname = proj.binName;
-	if(proj.type == project::LIBRARY)
-		trueBinname += ".so";
-
-	if(!std::filesystem::exists(trueBinname)){
-		std::cerr<<"Error: can not package an unbuilt project!"<<std::endl;
-		return false;
+	std::vector<std::filesystem::path> filesToInclude;
+	if(!std::filesystem::exists(proj.getTrueBinName())){
+		filesToInclude.push_back(std::filesystem::path(proj.getTrueBinName()));
 	}
 	
-	std::vector<std::filesystem::path> filesToInclude = {std::filesystem::path(trueBinname)};
 	for(const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(std::filesystem::current_path())){
 		if(pathContainsDirectory(dir_entry.path(), "_cppkg"))
 			continue;
-		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".inc")){
+		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".a" || dir_entry.path().extension() == ".lib" || dir_entry.path().extension() == ".so" || dir_entry.path().extension() == ".dll")){
 			filesToInclude.push_back(dir_entry.path());
 		}
 	}
 
-	if(!create_tar_xz(proj.name + ".tar.xz", filesToInclude)){
+	if(!create_tar_xz(proj.name + "-" + proj.os.createOsString() + "-" + (proj.mode == minimalProjectInfo::DEBUG ? "debug" : "release") + ".tar.xz", filesToInclude)){
 		std::cerr<<"Error: failed to create project package archive"<<std::endl;
 		return false;
 	}

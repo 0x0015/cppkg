@@ -7,6 +7,8 @@ public:
 	virtual void deserialize(const nlohmann::json& j) = 0;
 	void deserializeFromFile(const std::string& filename);
 	void serializeToFile(const std::string& filename) const;
+	static void writeJsonToFile(const std::string& filename, const nlohmann::json& j);
+	static nlohmann::json readJsonFromFile(const std::string& filename);
 
 	template<typename T> static inline bool trySetVal(const nlohmann::json& j, const std::string& name, T& value){
 		if(j.contains(name)){
