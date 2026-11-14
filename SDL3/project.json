@@ -6,7 +6,7 @@
 	"source": [
 		"main.cpp"
 	],
-	"compileFlags": [""],
+	"compileFlags": [],
 	"linkFlags": [],
 	"debug": {
 		"compileFlags": ["-g", "-Wall"],
@@ -24,7 +24,7 @@
 		"debug":{
 			"externalBuildCommand": "cd SDL;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j"
 		},
-		"linkFlags": ["-lwinmm"]
+		"linkFlags": ["-lwinmm", "-lole32"]
 	},
 	"postbuildCommands":[
 		"cp SDL/build/libSDL3.so .",
