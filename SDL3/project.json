@@ -24,7 +24,7 @@
 		"debug":{
 			"externalBuildCommand": "cd SDL;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j"
 		},
-		"linkFlags": ["-lwinmm", "-lole32"]
+		"linkFlags": ["-lwinmm", "-lole32", "-lhid", "-lsetupapi", "-lkernel32", "-luser32", "-lgdi32", "-limm32", "-loleaut32", "-lversion", "-luuid", "-ladvapi32", "-lshell32"]
 	},
 	"postbuildCommands":[
 		"cp SDL/build/libSDL3.so .",
