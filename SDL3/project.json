@@ -3,9 +3,7 @@
 	"version": "0.0.1",
 	"type": "library",
 	"binName": "libSDL3",
-	"source": [
-		"main.cpp"
-	],
+	"source": [],
 	"compileFlags": [],
 	"linkFlags": [],
 	"debug": {
