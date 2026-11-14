@@ -9,7 +9,8 @@
 	"compileFlags": [""],
 	"linkFlags": [],
 	"debug": {
-		"compileFlags": ["-g", "-Wall"]
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": "cd SDL;mkdir build;cd build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j"
 	},
 	"release": {
 		"compileFlags": ["-O2"]
@@ -17,14 +18,24 @@
 	"prebuildCommands":[
 		"git clone --depth 1 https://github.com/libsdl-org/SDL.git"
 	],
-	"externalBuildCommand": "cd SDL;mkdir build;cd build;cmake ..;make -j",
+	"externalBuildCommand": "cd SDL;mkdir build;cd build;cmake .. -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j",
+	"win-x86_64":{
+		"externalBuildCommand": "cd SDL;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j",
+		"debug":{
+			"externalBuildCommand": "cd SDL;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j"
+		}
+	},
 	"postbuildCommands":[
 		"cp SDL/build/libSDL3.so .",
+		"cp SDL/build/libSDL3.a .",
+		"cp SDL/build/SDL3.dll .",
+		"cp SDL/build/libSDL3.lib .",
 		"rm -rf -f include",
 		"cp -r SDL/include .",
 		"rm -rf -f SDL"
 	],
 	"extraCleanCommands":[
-		"rm -rf -f include"
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
 	]
 }
