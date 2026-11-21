@@ -226,7 +226,11 @@ bool depMan::resolveDeps(){
 		auto depPath = pkgPath / dep;
 		if(!std::filesystem::exists(depPath))
 			std::filesystem::create_directories(depPath);
-		auto depPkgFilename = dep + "-" + proj.os.createOsString() + "-" + (proj.mode == minimalProjectInfo::DEBUG ? "debug" : "release") + ".tar.xz";
+		auto depPkgFilename = dep + "-" + proj.os.createOsString() + "-" + (proj.mode == minimalProjectInfo::DEBUG ? "debug" : "release") + "-" + depProj.version + ".tar.xz";
+		if(std::filesystem::exists(depPath / depPkgFilename)){
+			std::cout<<"\tUp to Date!"<<std::endl;
+			continue;
+		}
 		auto downloadStatus = downloadRepoFile(dep + "/" + depPkgFilename, (depPath / depPkgFilename).string());
 		if(downloadStatus){
 			if(*downloadStatus == ALREADY_UP_TO_DATE)
@@ -253,12 +257,12 @@ bool depMan::createPackage(){
 	for(const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(std::filesystem::current_path())){
 		if(pathContainsDirectory(dir_entry.path(), "_cppkg"))
 			continue;
-		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".a" || dir_entry.path().extension() == ".lib" || dir_entry.path().extension() == ".so" || dir_entry.path().extension() == ".dll")){
+		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".hh" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".a" || dir_entry.path().extension() == ".lib" || dir_entry.path().extension() == ".so" || dir_entry.path().extension() == ".dll")){
 			filesToInclude.push_back(dir_entry.path());
 		}
 	}
 
-	if(!create_tar_xz(proj.name + "-" + proj.os.createOsString() + "-" + (proj.mode == minimalProjectInfo::DEBUG ? "debug" : "release") + ".tar.xz", filesToInclude)){
+	if(!create_tar_xz(proj.name + "-" + proj.os.createOsString() + "-" + (proj.mode == minimalProjectInfo::DEBUG ? "debug" : "release") + "-" + proj.version + ".tar.xz", filesToInclude)){
 		std::cerr<<"Error: failed to create project package archive"<<std::endl;
 		return false;
 	}

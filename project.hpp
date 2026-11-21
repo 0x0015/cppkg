@@ -20,7 +20,7 @@ public:
 		std::vector<std::string> compileFlags;
 		std::vector<std::string> linkFlags;
 
-		std::optional<std::string> externalBuildCommand;
+		std::optional<std::vector<std::string>> externalBuildCommand;
 	};
 	compOptions norm;
 	compOptions debug_extra;

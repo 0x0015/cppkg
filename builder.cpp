@@ -17,16 +17,20 @@ bool builder::build(){
 	auto buildPath = getTempPath("build");
 	if(proj.extraCompileOpts.externalBuildCommand){
 		std::cout<<"External build set, so skipping normal build and running external build command"<<std::endl;
-		std::cout<<"Command $ "<<*proj.extraCompileOpts.externalBuildCommand<<std::endl;
-		system(proj.extraCompileOpts.externalBuildCommand->c_str());
+		for(const auto& cmd : *proj.extraCompileOpts.externalBuildCommand){
+			std::cout<<"Command $ "<<cmd<<std::endl;
+			system(cmd.c_str());
+		}
 		buildInfo lastBuildInfo{proj.os, proj.mode};
 		lastBuildInfo.serializeToFile((buildPath / "lastBuildInfo.json").string());
 		return true;
 	}
 	if(proj.stdCompileOpts.externalBuildCommand){
 		std::cout<<"External build set, so skipping normal build and running external build command"<<std::endl;
-		std::cout<<"Command $ "<<*proj.stdCompileOpts.externalBuildCommand<<std::endl;
-		system(proj.stdCompileOpts.externalBuildCommand->c_str());
+		for(const auto& cmd : *proj.stdCompileOpts.externalBuildCommand){
+			std::cout<<"Command $ "<<cmd<<std::endl;
+			system(cmd.c_str());
+		}
 		buildInfo lastBuildInfo{proj.os, proj.mode};
 		lastBuildInfo.serializeToFile((buildPath / "lastBuildInfo.json").string());
 		return true;

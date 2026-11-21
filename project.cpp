@@ -43,8 +43,12 @@ nlohmann::json project::serialize() const{
 	if(!extraCleanCommands.empty())
 		output["extraCleanCommands"] = extraCleanCommands;
 
-	if(norm.externalBuildCommand)
-		output["externalBuildCommand"] = *norm.externalBuildCommand;
+	if(norm.externalBuildCommand){
+		if(norm.externalBuildCommand->size() == 1)
+			output["externalBuildCommand"] = norm.externalBuildCommand->front();
+		else
+			output["externalBuildCommand"] = *norm.externalBuildCommand;
+	}
 
 
 	// Serialize OS-specific options
@@ -62,7 +66,12 @@ nlohmann::json project::serialize() const{
 			if(!opts.sourceFiles.empty()) osObj["source"] = opts.sourceFiles;
 			if(!opts.compileFlags.empty()) osObj["compileFlags"] = opts.compileFlags;
 			if(!opts.linkFlags.empty()) osObj["linkFlags"] = opts.linkFlags;
-			if(opts.externalBuildCommand) osObj["externalBuildCommand"] = *opts.externalBuildCommand;
+			if(opts.externalBuildCommand){
+				if(opts.externalBuildCommand->size() == 1)
+					osObj["externalBuildCommand"] = opts.externalBuildCommand->front();
+				else
+					osObj["externalBuildCommand"] = *opts.externalBuildCommand;
+			}
 		}
 		
 		if(osDebug_ExtraOpts.contains(os)){
@@ -72,7 +81,12 @@ nlohmann::json project::serialize() const{
 				if(!opts.sourceFiles.empty()) dbgObj["source"] = opts.sourceFiles;
 				if(!opts.compileFlags.empty()) dbgObj["compileFlags"] = opts.compileFlags;
 				if(!opts.linkFlags.empty()) dbgObj["linkFlags"] = opts.linkFlags;
-				if(opts.externalBuildCommand) dbgObj["externalBuildCommand"] = *opts.externalBuildCommand;
+				if(opts.externalBuildCommand){
+					if(opts.externalBuildCommand->size() == 1)
+						dbgObj["externalBuildCommand"] = opts.externalBuildCommand->front();
+					else
+						dbgObj["externalBuildCommand"] = *opts.externalBuildCommand;
+				}
 			}
 		}
 		
@@ -83,7 +97,12 @@ nlohmann::json project::serialize() const{
 				if(!opts.sourceFiles.empty()) relObj["source"] = opts.sourceFiles;
 				if(!opts.compileFlags.empty()) relObj["compileFlags"] = opts.compileFlags;
 				if(!opts.linkFlags.empty()) relObj["linkFlags"] = opts.linkFlags;
-				if(opts.externalBuildCommand) relObj["externalBuildCommand"] = *opts.externalBuildCommand;
+				if(opts.externalBuildCommand){
+					if(opts.externalBuildCommand->size() == 1)
+						relObj["externalBuildCommand"] = opts.externalBuildCommand->front();
+					else
+						relObj["externalBuildCommand"] = *opts.externalBuildCommand;
+				}
 			}
 		}
 	}
@@ -108,23 +127,35 @@ void project::deserialize(const nlohmann::json& j){
 	trySetVal(j, "source", norm.sourceFiles);
 	trySetVal(j, "compileFlags", norm.compileFlags);
 	trySetVal(j, "linkFlags", norm.linkFlags);
-	if(j.contains("externalBuildCommand"))
-		norm.externalBuildCommand = j["externalBuildCommand"].get<std::string>();
+	if(j.contains("externalBuildCommand")){
+		if(j["externalBuildCommand"].is_string())
+			norm.externalBuildCommand = {j["externalBuildCommand"].get<std::string>()};
+		else
+			norm.externalBuildCommand = j["externalBuildCommand"].get<std::vector<std::string>>();
+	}
 	if(j.contains("debug")){
 		const auto& debug = j["debug"];
 		trySetVal(debug, "source", debug_extra.sourceFiles);
 		trySetVal(debug, "compileFlags", debug_extra.compileFlags);
 		trySetVal(debug, "linkFlags", debug_extra.linkFlags);
-		if(debug.contains("externalBuildCommand"))
-			debug_extra.externalBuildCommand = debug["externalBuildCommand"].get<std::string>();
+		if(debug.contains("externalBuildCommand")){
+			if(debug["externalBuildCommand"].is_string())
+				debug_extra.externalBuildCommand = {debug["externalBuildCommand"].get<std::string>()};
+			else
+				debug_extra.externalBuildCommand = debug["externalBuildCommand"].get<std::vector<std::string>>();
+		}
 	}
 	if(j.contains("release")){
 		const auto& release = j["release"];
 		trySetVal(release, "source", release_extra.sourceFiles);
 		trySetVal(release, "compileFlags", release_extra.compileFlags);
 		trySetVal(release, "linkFlags", release_extra.linkFlags);
-		if(release.contains("externalBuildCommand"))
-			release_extra.externalBuildCommand = release["externalBuildCommand"].get<std::string>();
+		if(release.contains("externalBuildCommand")){
+			if(release["externalBuildCommand"].is_string())
+				release_extra.externalBuildCommand = {release["externalBuildCommand"].get<std::string>()};
+			else
+				release_extra.externalBuildCommand = release["externalBuildCommand"].get<std::vector<std::string>>();
+		}
 	}
 	trySetVal(j, "deps", deps);
 	trySetVal(j, "customCommands", customCommands);
@@ -145,16 +176,24 @@ void project::deserialize(const nlohmann::json& j){
 			trySetVal(vals, "source", osVerSpecificOpts.sourceFiles);
 			trySetVal(vals, "compileFlags", osVerSpecificOpts.compileFlags);
 			trySetVal(vals, "linkFlags", osVerSpecificOpts.linkFlags);
-			if(vals.contains("externalBuildCommand"))
-				osVerSpecificOpts.externalBuildCommand = vals["externalBuildCommand"].get<std::string>();
+			if(vals.contains("externalBuildCommand")){
+				if(vals["externalBuildCommand"].is_string())
+					osVerSpecificOpts.externalBuildCommand = {vals["externalBuildCommand"].get<std::string>()};
+				else
+					osVerSpecificOpts.externalBuildCommand = vals["externalBuildCommand"].get<std::vector<std::string>>();
+			}
 			if(vals.contains("debug")){
 				auto& osVerSpecificDebugOpts = osDebug_ExtraOpts[*osStr];	
 				const auto& debug = vals["debug"];
 				trySetVal(debug, "source", osVerSpecificDebugOpts.sourceFiles);
 				trySetVal(debug, "compileFlags", osVerSpecificDebugOpts.compileFlags);
 				trySetVal(debug, "linkFlags", osVerSpecificDebugOpts.linkFlags);
-				if(debug.contains("externalBuildCommand"))
-					osVerSpecificDebugOpts.externalBuildCommand = debug["externalBuildCommand"].get<std::string>();
+				if(debug.contains("externalBuildCommand")){
+					if(debug["externalBuildCommand"].is_string())
+						osVerSpecificDebugOpts.externalBuildCommand = {debug["externalBuildCommand"].get<std::string>()};
+					else
+						osVerSpecificDebugOpts.externalBuildCommand = debug["externalBuildCommand"].get<std::vector<std::string>>();
+				}
 			}
 			if(vals.contains("release")){
 				auto& osVerSpecificReleaseOpts = osRelease_ExtraOpts[*osStr];	
@@ -162,8 +201,12 @@ void project::deserialize(const nlohmann::json& j){
 				trySetVal(release, "source", osVerSpecificReleaseOpts.sourceFiles);
 				trySetVal(release, "compileFlags", osVerSpecificReleaseOpts.compileFlags);
 				trySetVal(release, "linkFlags", osVerSpecificReleaseOpts.linkFlags);
-				if(release.contains("externalBuildCommand"))
-					osVerSpecificReleaseOpts.externalBuildCommand = release["externalBuildCommand"].get<std::string>();
+				if(release.contains("externalBuildCommand")){
+					if(release["externalBuildCommand"].is_string())
+						osVerSpecificReleaseOpts.externalBuildCommand = {release["externalBuildCommand"].get<std::string>()};
+					else
+						osVerSpecificReleaseOpts.externalBuildCommand = release["externalBuildCommand"].get<std::vector<std::string>>();
+				}
 			}
 		}
 	}
