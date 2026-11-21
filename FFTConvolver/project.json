@@ -1,0 +1,32 @@
+{
+	"name": "FFTConvolver",
+	"version": "957c688",
+	"type": "library",
+	"binName": "libFFTConvolver",
+	"source": [
+		"FFTConvolver/src/AudioFFT.cpp",
+		"FFTConvolver/src/FFTConvolver.cpp",
+		"FFTConvolver/src/TwoStageFFTConvolver.cpp",
+		"FFTConvolver/src/Utilities.cpp"
+	],
+	"compileFlags": [
+		"-IFFTConvolver/include"
+	],
+	"linkFlags": [],
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/grawlinson/FFTConvolver.git",
+		"cd FFTConvolver;git checkout 957c688"
+	],
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r FFTConvolver/include .",
+		"rm -rf -f FFTConvolver"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

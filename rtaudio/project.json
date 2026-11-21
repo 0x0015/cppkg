@@ -1,0 +1,73 @@
+{
+	"name": "rtaudio",
+	"version": "e5f0774",
+	"type": "library",
+	"binName": "librtaudio",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir rtaudio/build",
+			"cd rtaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DRTAUDIO_API_JACK=OFF",
+			"cd rtaudio/build;make -j16",
+			"cp rtaudio/build/librtaudio.a .",
+			"rm -rf rtaudio/build;mkdir rtaudio/build",
+			"cd rtaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DRTAUDIO_API_JACK=OFF",
+			"cd rtaudio/build;make -j16",
+			"cp rtaudio/build/librtaudio.so ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/thestk/rtaudio.git",
+		"cd rtaudio;git checkout e5f0774"
+	],
+	"externalBuildCommand": [
+		"mkdir rtaudio/build",
+		"cd rtaudio/build;cmake .. -DBUILD_SHARED_LIBS=OFF -DRTAUDIO_API_JACK=OFF",
+		"cd rtaudio/build;make -j16",
+		"cp rtaudio/build/librtaudio.a .",
+		"rm -rf rtaudio/build;mkdir rtaudio/build",
+		"cd rtaudio/build;cmake .. -DRTAUDIO_API_JACK=OFF",
+		"cd rtaudio/build;make -j16",
+		"cp rtaudio/build/librtaudio.so ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir rtaudio/build",
+			"cd rtaudio/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF -DRTAUDIO_API_ASIO=ON -DRTAUDIO_API_JACK=OFF",
+			"cd rtaudio/build;make -j16",
+			"cp rtaudio/build/librtaudio.a .",
+			"rm -rf rtaudio/build;mkdir rtaudio/build",
+			"cd rtaudio/build;x86_64-w64-mingw32-cmake .. -DRTAUDIO_API_ASIO=ON -DRTAUDIO_API_JACK=OFF",
+			"cd rtaudio/build;make -j16",
+			"cp rtaudio/build/librtaudio.dll ."
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir rtaudio/build",
+				"cd rtaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DRTAUDIO_API_ASIO=ON -DRTAUDIO_API_JACK=OFF",
+				"cd rtaudio/build;make -j16",
+				"cp rtaudio/build/librtaudiod.a librtaudio.a",
+				"rm -rf rtaudio/build;mkdir rtaudio/build",
+				"cd rtaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DRTAUDIO_API_ASIO=ON -DRTAUDIO_API_JACK=OFF",
+				"cd rtaudio/build;make -j16",
+				"cp rtaudio/build/librtaudiod.dll librtaudio.dll"
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r rtaudio/include .",
+		"rm -rf -f rtaudio"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

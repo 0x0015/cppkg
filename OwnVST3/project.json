@@ -1,0 +1,75 @@
+{
+	"name": "OwnVST3",
+	"version": "472f37c",
+	"type": "library",
+	"binName": "libownvst3",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir OwnVST3/build",
+			"cd OwnVST3/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+			"cd OwnVST3/build;make -j16",
+			"cp OwnVST3/build/libownvst3.a .",
+			"rm -rf OwnVST3/build;mkdir OwnVST3/build",
+			"cd OwnVST3/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd OwnVST3/build;make -j16",
+			"cp OwnVST3/build/libownvst3.so ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 --recursive https://github.com/0x0015/OwnVST3.git",
+		"cd OwnVST3;git checkout 472f37c"
+	],
+	"externalBuildCommand": [
+		"mkdir OwnVST3/build",
+		"cd OwnVST3/build;cmake .. -DBUILD_SHARED_LIBS=OFF",
+		"cd OwnVST3/build;make -j16",
+		"cp OwnVST3/build/libownvst3.a .",
+		"rm -rf OwnVST3/build;mkdir OwnVST3/build",
+		"cd OwnVST3/build;cmake .. -DRTAUDIO_API_JACK=OFF",
+		"cd OwnVST3/build;make -j16",
+		"cp OwnVST3/build/libownvst3.so ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir OwnVST3/build",
+			"cd OwnVST3/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS='-DRELEASE'",
+			"cd OwnVST3/build;make -j16",
+			"cp OwnVST3/build/libownvst3.a .",
+			"rm -rf OwnVST3/build;mkdir OwnVST3/build",
+			"cd OwnVST3/build;x86_64-w64-mingw32-cmake .. -DCMAKE_CXX_FLAGS='-DRELEASE'",
+			"cd OwnVST3/build;make -j16",
+			"cp OwnVST3/build/libownvst3.dll ."
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir OwnVST3/build",
+				"cd OwnVST3/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS='-DDEVELOPMENT'",
+				"cd OwnVST3/build;make -j16",
+				"cp OwnVST3/build/libownvst3.a .",
+				"rm -rf OwnVST3/build;mkdir OwnVST3/build",
+				"cd OwnVST3/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS='-DDEVELOPMENT'",
+				"cd OwnVST3/build;make -j16",
+				"cp OwnVST3/build/libownvst3.dll ."
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r OwnVST3/include .",
+		"rsync -am --include='*/' --include='*.h' --exclude='*' OwnVST3/sdk/public.sdk include",
+		"rsync -am --include='*/' --include='*.h' --exclude='*' OwnVST3/sdk/pluginterfaces include",
+		"rm -rf -f OwnVST3"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

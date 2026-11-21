@@ -1,0 +1,73 @@
+{
+	"name": "libspatialaudio",
+	"version": "d149ed9",
+	"type": "library",
+	"binName": "libspatialaudio",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir libspatialaudio/build",
+			"cd libspatialaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+			"cd libspatialaudio/build;make -j16",
+			"cp libspatialaudio/build/libspatialaudio.a .",
+			"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
+			"cd libspatialaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd libspatialaudio/build;make -j16",
+			"cp libspatialaudio/build/libspatialaudio.so ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/videolan/libspatialaudio.git",
+		"cd libspatialaudio;git checkout d149ed9"
+	],
+	"externalBuildCommand": [
+		"mkdir libspatialaudio/build",
+		"cd libspatialaudio/build;cmake .. -DBUILD_SHARED_LIBS=OFF",
+		"cd libspatialaudio/build;make -j16",
+		"cp libspatialaudio/build/libspatialaudio.a .",
+		"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
+		"cd libspatialaudio/build;cmake ..",
+		"cd libspatialaudio/build;make -j16",
+		"cp libspatialaudio/build/libspatialaudio.so ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir libspatialaudio/build",
+			"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF",
+			"cd libspatialaudio/build;make -j16",
+			"cp libspatialaudio/build/libspatialaudio.a .",
+			"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
+			"cd libspatialaudio/build;x86_64-w64-mingw32-cmake ..",
+			"cd libspatialaudio/build;make -j16",
+			"cp libspatialaudio/build/libspatialaudio.dll libspatialaudio.dll"
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir libspatialaudio/build",
+				"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+				"cd libspatialaudio/build;make -j16",
+				"cp libspatialaudio/build/libspatialaudio.a .",
+				"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
+				"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug",
+				"cd libspatialaudio/build;make -j16",
+				"cp libspatialaudio/build/libspatialaudio.dll libspatialaudio.dll"
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r libspatialaudio/include .",
+		"rm -rf -f libspatialaudio"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

@@ -1,0 +1,34 @@
+{
+	"name": "midifile",
+	"version": "98917df",
+	"type": "library",
+	"binName": "midifile",
+	"source": [
+		"midifile/src/Binasc.cpp",
+		"midifile/src/MidiEvent.cpp",
+		"midifile/src/MidiEventList.cpp",
+		"midifile/src/MidiFile.cpp",
+		"midifile/src/MidiMessage.cpp",
+		"midifile/src/Options.cpp"
+	],
+	"compileFlags": [
+		"-Imidifile/include"
+	],
+	"linkFlags": [],
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/craigsapp/midifile.git",
+		"cd midifile;git checkout 98917df"
+	],
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r midifile/include .",
+		"rm -rf -f midifile"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

@@ -1,0 +1,73 @@
+{
+	"name": "libsamplerate",
+	"version": "0844c20",
+	"type": "library",
+	"binName": "libsamplerate",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir libsamplerate/build",
+			"cd libsamplerate/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
+			"cd libsamplerate/build;make -j16",
+			"cp libsamplerate/build/src/libsamplerate.so .",
+			"rm -rf libsamplerate/build;mkdir libsamplerate/build",
+			"cd libsamplerate/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd libsamplerate/build;make -j16",
+			"cp libsamplerate/build/src/libsamplerate.a ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/libsndfile/libsamplerate.git",
+		"cd libsamplerate;git checkout 0844c20"
+	],
+	"externalBuildCommand": [
+		"mkdir libsamplerate/build",
+		"cd libsamplerate/build;cmake .. -DBUILD_SHARED_LIBS=ON",
+		"cd libsamplerate/build;make -j16",
+		"cp libsamplerate/build/src/libsamplerate.so .",
+		"rm -rf libsamplerate/build;mkdir libsamplerate/build",
+		"cd libsamplerate/build;cmake ..",
+		"cd libsamplerate/build;make -j16",
+		"cp libsamplerate/build/src/libsamplerate.a ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir libsamplerate/build",
+			"cd libsamplerate/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF",
+			"cd libsamplerate/build;make -j16",
+			"cp libsamplerate/build/src/libsamplerate.a .",
+			"rm -rf libsamplerate/build;mkdir libsamplerate/build",
+			"cd libsamplerate/build;x86_64-w64-mingw32-cmake ..",
+			"cd libsamplerate/build;make -j16",
+			"cp libsamplerate/build/src/libsamplerate-0.dll libsamplerate.dll"
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir libsamplerate/build",
+				"cd libsamplerate/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+				"cd libsamplerate/build;make -j16",
+				"cp libsamplerate/build/src/libsamplerate.a .",
+				"rm -rf libsamplerate/build;mkdir libsamplerate/build",
+				"cd libsamplerate/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug",
+				"cd libsamplerate/build;make -j16",
+				"cp libsamplerate/build/src/libsamplerate-0.dll libsamplerate.dll"
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r libsamplerate/include .",
+		"rm -rf -f libsamplerate"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}
