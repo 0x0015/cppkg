@@ -1,6 +1,6 @@
 {
 	"name": "SDL3",
-	"version": "0.0.1",
+	"version": "3.4.20",
 	"type": "library",
 	"binName": "libSDL3",
 	"source": [],
@@ -8,19 +8,37 @@
 	"linkFlags": [],
 	"debug": {
 		"compileFlags": ["-g", "-Wall"],
-		"externalBuildCommand": "cd SDL;mkdir build;cd build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j"
+		"externalBuildCommand": [
+			"mkdir SDL/build;",
+			"cd SDL/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON",
+			"cd SDL/build;make -j16"
+		]
 	},
 	"release": {
 		"compileFlags": ["-O2"]
 	},
 	"prebuildCommands":[
-		"git clone --depth 1 https://github.com/libsdl-org/SDL.git"
+		"curl -LO https://github.com/libsdl-org/SDL/releases/download/release-3.4.20/SDL3-3.4.20.tar.gz",
+		"tar -xzvf SDL3-3.4.20.tar.gz",
+		"mv SDL3-3.4.20 SDL"
 	],
-	"externalBuildCommand": "cd SDL;mkdir build;cd build;cmake .. -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j",
+	"externalBuildCommand": [
+		"mkdir SDL/build",
+		"cd SDL/build;cmake .. -DSDL_SHARED=ON -DSDL_STATIC=ON",
+		"cd SDL/build;make -j16"
+	],
 	"win-x86_64":{
-		"externalBuildCommand": "cd SDL;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j",
+		"externalBuildCommand": [
+			"mkdir SDL/build",
+			"cd SDL/build;x86_64-w64-mingw32-cmake .. -DSDL_SHARED=ON -DSDL_STATIC=ON",
+			"cd SDL/build;make -j16"
+		],
 		"debug":{
-			"externalBuildCommand": "cd SDL;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON;make -j"
+			"externalBuildCommand": [
+				"mkdir SDL/build",
+				"cd SDL/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DSDL_SHARED=ON -DSDL_STATIC=ON",
+				"cd SDL/build;make -j16"
+			]
 		},
 		"linkFlags": ["-lwinmm", "-lole32", "-lhid", "-lsetupapi", "-lkernel32", "-luser32", "-lgdi32", "-limm32", "-loleaut32", "-lversion", "-luuid", "-ladvapi32", "-lshell32"]
 	},
@@ -31,7 +49,9 @@
 		"cp SDL/build/libSDL3.lib .",
 		"rm -rf -f include",
 		"cp -r SDL/include .",
-		"rm -rf -f SDL"
+		"rm -rf -f SDL/build",
+		"rm -rf -f SDL",
+		"rm -f *.tar.gz"
 	],
 	"extraCleanCommands":[
 		"rm -rf -f include",

@@ -1,6 +1,6 @@
 {
 	"name": "kissfft",
-	"version": "0.0.1",
+	"version": "de93ec3",
 	"type": "library",
 	"binName": "libkissfft-double",
 	"source": [],
@@ -8,19 +8,56 @@
 	"linkFlags": [],
 	"debug": {
 		"compileFlags": ["-g", "-Wall"],
-		"externalBuildCommand": "cd kissfft;mkdir build;cd build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.a ..;rm -rf build;mkdir build;cd build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.so .."
+		"externalBuildCommand": [
+			"mkdir kissfft/build",
+			"cd kissfft/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+			"cd kissfft/build;make -j16",
+			"cp kissfft/build/libkissfft-double.a .",
+			"rm -rf kissfft/build;mkdir kissfft/build",
+			"cd kissfft/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+			"cd kissfft/build;make -j16",
+			"cp kissfft/build/libkissfft-double.so ."
+		]
 	},
 	"release": {
 		"compileFlags": ["-O2"]
 	},
 	"prebuildCommands":[
-		"git clone --depth 1 https://github.com/mborgerding/kissfft.git"
+		"git clone --depth 1 https://github.com/mborgerding/kissfft.git",
+		"cd kissfft;git checkout de93ec3"
 	],
-	"externalBuildCommand": "cd kissfft;mkdir build;cd build;cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.a ..;rm -rf build;mkdir build;cd build;cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.so ..",
+	"externalBuildCommand": [
+		"mkdir kissfft/build",
+		"cd kissfft/build;cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+		"cd kissfft/build;make -j16",
+		"cp kissfft/build/libkissfft-double.a .",
+		"rm -rf kissfft/build;mkdir kissfft/build",
+		"cd kissfft/build;cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+		"cd kissfft/build;make -j16",
+		"cp kissfft/build/libkissfft-double.so ."
+	],
 	"win-x86_64":{
-		"externalBuildCommand": "cd kissfft;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DBUILD_SHARED_LIBS=OFF -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.a ..;rm -rf build;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.dll ..",
+		"externalBuildCommand": [
+			"mkdir kissfft/build",
+			"cd kissfft/build;x86_64-w64-mingw32-cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DBUILD_SHARED_LIBS=OFF -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+			"cd kissfft/build;make -j16",
+			"cp kissfft/build/libkissfft-double.a .;",
+			"rm -rf kissfft/build;mkdir kissfft/build",
+			"cd kissfft/build;x86_64-w64-mingw32-cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+			"cd kissfft/build;make -j16",
+			"cp kissfft/build/libkissfft-double.dll ."
+		],
 		"debug":{
-			"externalBuildCommand": "cd kissfft;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DBUILD_SHARED_LIBS=OFF -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.a ..;rm -rf build;mkdir build;cd build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF;make -j;cd ..;cp build/libkissfft-double.dll .."
+			"externalBuildCommand": [
+				"mkdir kissfft/build",
+				"cd kissfft/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_STATIC=ON -DBUILD_SHARED_LIBS=OFF -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+				"cd kissfft/build;make -j16",
+				"cp kissfft/build/libkissfft-double.a .",
+				"rm -rf kissfft/build;mkdir kissfft/build",
+				"cd kissfft/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
+				"cd kissfft/build;make -j16",
+				"cp kissfft/build/libkissfft-double.dll ."
+			]
 		},
 		"linkFlags": []
 	},

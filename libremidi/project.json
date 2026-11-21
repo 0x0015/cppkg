@@ -1,0 +1,83 @@
+{
+	"name": "libremidi",
+	"version": "d240e3f",
+	"type": "library",
+	"binName": "liblibremidi",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir libremidi/build",
+			"cd libremidi/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
+			"cd libremidi/build;make -j16",
+			"cp libremidi/build/liblibremidi.so .",
+			"rm -rf libremidi/build;mkdir libremidi/build",
+			"cd libremidi/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd libremidi/build;make -j16",
+			"cp libremidi/build/liblibremidi.a ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/celtera/libremidi.git",
+		"cd libremidi;git checkout d240e3f"
+	],
+	"externalBuildCommand": [
+		"mkdir libremidi/build",
+		"cd libremidi/build;cmake .. -DBUILD_SHARED_LIBS=ON",
+		"cd libremidi/build;make -j16",
+		"cp libremidi/build/liblibremidi.so .",
+		"rm -rf libremidi/build;mkdir libremidi/build",
+		"cd libremidi/build;cmake ..",
+		"cd libremidi/build;make -j16",
+		"cp libremidi/build/liblibremidi.a ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir libremidi/build",
+			"cd libremidi/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF -DLIBREMIDI_NO_WINMIDI=ON",
+			"cd libremidi/build;make -j16",
+			"cp libremidi/build/liblibremidi.a .",
+			"rm -rf libremidi/build;mkdir libremidi/build",
+			"mkdir libremidi/build/runtimeObj",
+			"ln -s /usr/x86_64-w64-mingw32/lib/libruntimeobject.a libremidi/build/runtimeObj/libRuntimeObject.a",
+			"cd libremidi/build;x86_64-w64-mingw32-cmake .. -DLIBREMIDI_NO_WINMIDI=ON -DCMAKE_SHARED_LINKER_FLAGS=-L$(pwd)/runtimeObj",
+			"cd libremidi/build;make -j16",
+			"cp libremidi/build/liblibremidi.dll ."
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir libremidi/build",
+				"mkdir libremidi/build/runtimeObj",
+				"ln -s /usr/x86_64-w64-mingw32/lib/libruntimeobject.a libremidi/build/runtimeObj/libRuntimeObject.a",
+				"cd libremidi/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DLIBREMIDI_NO_WINMIDI=ON",
+				"cd libremidi/build;make -j16",
+				"cp libremidi/build/liblibremidi.a .",
+				"rm -rf libremidi/build;mkdir libremidi/build",
+				"mkdir libremidi/build/runtimeObj",
+				"ln -s /usr/x86_64-w64-mingw32/lib/libruntimeobject.a libremidi/build/runtimeObj/libRuntimeObject.a",
+				"cd libremidi/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBREMIDI_NO_WINMIDI=ON -DCMAKE_SHARED_LINKER_FLAGS=-L$(pwd)/runtimeObj",
+				"cd libremidi/build;make -j16",
+				"cp libremidi/build/liblibremidi.dll ."
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"cp libremidi/build/liblibremidi.so .",
+		"cp libremidi/build/liblibremidi.a .",
+		"cp libremidi/build/liblibremidi.dll .",
+		"cp libremidi/build/liblibremidi.lib .",
+		"rm -rf -f include",
+		"cp -r libremidi/include .",
+		"rm -rf -f libremidi"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}
