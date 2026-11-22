@@ -7,7 +7,7 @@
 	"compileFlags": [],
 	"linkFlags": [],
 	"debug": {
-		"compileFlags": ["-g", "-Wall"],
+		"compileFlags": ["-g", "-Wall", "-DDEVELOPMENT"],
 		"externalBuildCommand": [
 			"mkdir OwnVST3/build",
 			"cd OwnVST3/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
@@ -20,7 +20,7 @@
 		]
 	},
 	"release": {
-		"compileFlags": ["-O2"]
+		"compileFlags": ["-O2", "-DRELEASE"]
 	},
 	"prebuildCommands":[
 		"git clone --depth 1 --recursive https://github.com/0x0015/OwnVST3.git",
