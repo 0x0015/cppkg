@@ -66,6 +66,7 @@
 		"cp -r OwnVST3/include .",
 		"rsync -am --include='*/' --include='*.h' --exclude='*' OwnVST3/sdk/public.sdk include",
 		"rsync -am --include='*/' --include='*.h' --exclude='*' OwnVST3/sdk/pluginterfaces include",
+		"rsync -am --include='*/' --include='*.h' --exclude='*' OwnVST3/sdk/base include",
 		"rm -rf -f OwnVST3"
 	],
 	"extraCleanCommands":[
