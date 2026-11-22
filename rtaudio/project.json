@@ -64,10 +64,13 @@
 	"postbuildCommands":[
 		"rm -rf -f include",
 		"cp -r rtaudio/include .",
+		"cp -r rtaudio/*.h .",
+		"cp -r rtaudio/*.hh .",
 		"rm -rf -f rtaudio"
 	],
 	"extraCleanCommands":[
 		"rm -rf -f include",
+		"rm -f *.h *.hh",
 		"rm -f *.dll *.lib *.a"
 	]
 }
