@@ -64,6 +64,7 @@
 	"postbuildCommands":[
 		"rm -rf -f include",
 		"cp -r libspatialaudio/include .",
+		"cp libspatialaudio/build/include/SpatialaudioConfig.h include",
 		"rm -rf -f libspatialaudio"
 	],
 	"extraCleanCommands":[
