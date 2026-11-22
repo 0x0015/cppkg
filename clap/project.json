@@ -1,0 +1,30 @@
+{
+	"name": "clap",
+	"version": "a47f6ba",
+	"type": "library",
+	"binName": null,
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": []
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/free-audio/clap.git",
+		"cd clap;git checkout a47f6ba"
+	],
+	"externalBuildCommand": [],
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r clap/include .",
+		"rm -rf -f clap"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}
