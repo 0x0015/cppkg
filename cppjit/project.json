@@ -1,0 +1,69 @@
+{
+	"name": "cppjit",
+	"version": "6a61f41",
+	"type": "library",
+	"binName": "libcppjit",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir cppjit/build",
+			"cd cppjit/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd cppjit/build;make cppjit_full -j16",
+			"cp cppjit/build/libcppjit_full.a libcppjit.a",
+			"rm -rf cppjit/build;mkdir cppjit/build",
+			"cd cppjit/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DCPPJIT_BUILD_SHARED=ON",
+			"cd cppjit/build;make -j16",
+			"cp cppjit/build/libcppjit.so ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[],
+	"externalBuildCommand": [
+		"mkdir cppjit/build",
+		"cd cppjit/build;cmake ..",
+		"cd cppjit/build;make cppjit_full -j16",
+		"cp cppjit/build/libcppjit_full.a libcppjit.a",
+		"rm -rf cppjit/build;mkdir cppjit/build",
+		"cd cppjit/build;cmake .. -DCPPJIT_BUILD_SHARED=ON",
+		"cd cppjit/build;make -j16",
+		"cp cppjit/build/libcppjit.so ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir cppjit/build",
+			"cd cppjit/build;x86_64-w64-mingw32-cmake ..",
+			"cd cppjit/build;make cppjit_full -j16",
+			"cp cppjit/build/libcppjit_full.a libcppjit.a;",
+			"rm -rf cppjit/build;mkdir cppjit/build",
+			"cd cppjit/build;x86_64-w64-mingw32-cmake .. -DCPPJIT_BUILD_SHARED=ON",
+			"cd cppjit/build;make -j16",
+			"cp cppjit/build/libcppjit.dll ."
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir cppjit/build",
+				"cd cppjit/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug",
+				"cd cppjit/build;make cppjit_full -j16",
+				"cp cppjit/build/libcppjit_full.a libcppjit.a",
+				"rm -rf cppjit/build;mkdir cppjit/build",
+				"cd cppjit/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DCPPJIT_BUILD_SHARED=ON",
+				"cd cppjit/build;make -j16",
+				"cp cppjit/build/libcppjit.dll ."
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"cp cppjit/src/cppjit.hpp .",
+		"rm -rf -f cppjit"
+	],
+	"extraCleanCommands":[
+		"rm -f *.hpp",
+		"rm -f *.dll *.lib *.a"
+	]
+}
