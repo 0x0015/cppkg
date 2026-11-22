@@ -1,0 +1,76 @@
+{
+	"name": "lzma",
+	"version": "5.8.4",
+	"type": "library",
+	"binName": "liblzma",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir xz/build;",
+			"cd xz/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd xz/build;make -j16",
+			"cp xz/build/liblzma.a .",
+			"rm -rf xz/build;mkdir xz/build",
+			"cd xz/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
+			"cd xz/build;make -j16",
+			"cp xz/build/liblzma.so ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"curl -LO https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz",
+		"tar -xzvf xz-5.8.4.tar.gz",
+		"mv xz-5.8.4 xz"
+	],
+	"externalBuildCommand": [
+		"mkdir xz/build",
+		"cd xz/build;cmake ..",
+		"cd xz/build;make -j16",
+		"cp xz/build/liblzma.a .",
+		"rm -rf xz/build;mkdir xz/build",
+		"cd xz/build;cmake .. -DBUILD_SHARED_LIBS=ON",
+		"cd xz/build;make -j16",
+		"cp xz/build/liblzma.so ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir xz/build",
+			"cd xz/build;x86_64-w64-mingw32-cmake ..",
+			"cd xz/build;make -j16",
+			"cp xz/build/liblzma.dll .",
+			"rm -rf xz/build;mkdir xz/build",
+			"cd xz/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF",
+			"cd xz/build;make -j16",
+			"cp xz/build/liblzma.a ."
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir xz/build",
+				"cd xz/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug",
+				"cd xz/build;make -j16",
+				"cp xz/build/liblzma.dll .",
+				"rm -rf xz/build;mkdir xz/build",
+				"cd xz/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+				"cd xz/build;make -j16",
+				"cp xz/build/liblzma.a ."
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r xz/src/liblzma/api include",
+		"rm -rf -f xz/build",
+		"rm -rf -f xz",
+		"rm -f *.tar.gz"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}
