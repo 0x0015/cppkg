@@ -6,6 +6,7 @@
 	"source": [],
 	"compileFlags": [],
 	"linkFlags": [],
+	"deps": ["ogg"],
 	"debug": {
 		"compileFlags": ["-g", "-Wall"],
 		"externalBuildCommand": [

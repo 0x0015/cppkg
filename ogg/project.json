@@ -1,0 +1,76 @@
+{
+	"name": "ogg",
+	"version": "1.3.6",
+	"type": "library",
+	"binName": "libogg",
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": [
+			"mkdir ogg/build;",
+			"cd ogg/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd ogg/build;make -j16",
+			"cp ogg/build/libogg.a .",
+			"rm -rf ogg/build;mkdir ogg/build",
+			"cd ogg/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
+			"cd ogg/build;make -j16",
+			"cp ogg/build/libogg.so ."
+		]
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"curl -LO https://github.com/xiph/ogg/releases/download/v1.3.6/libogg-1.3.6.tar.xz",
+		"tar -xvf libogg-1.3.6.tar.xz",
+		"mv libogg-1.3.6 ogg"
+	],
+	"externalBuildCommand": [
+		"mkdir ogg/build",
+		"cd ogg/build;cmake ..",
+		"cd ogg/build;make -j16",
+		"cp ogg/build/libogg.a .",
+		"rm -rf ogg/build;mkdir ogg/build",
+		"cd ogg/build;cmake .. -DBUILD_SHARED_LIBS=ON",
+		"cd ogg/build;make -j16",
+		"cp ogg/build/libogg.so ."
+	],
+	"win-x86_64":{
+		"externalBuildCommand": [
+			"mkdir ogg/build",
+			"cd ogg/build;x86_64-w64-mingw32-cmake ..",
+			"cd ogg/build;make -j16",
+			"cp ogg/build/libogg.dll .",
+			"rm -rf ogg/build;mkdir ogg/build",
+			"cd ogg/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF",
+			"cd ogg/build;make -j16",
+			"cp ogg/build/libogg.a ."
+		],
+		"debug":{
+			"externalBuildCommand": [
+				"mkdir ogg/build",
+				"cd ogg/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug",
+				"cd ogg/build;make -j16",
+				"cp ogg/build/libogg.dll .",
+				"rm -rf ogg/build;mkdir ogg/build",
+				"cd ogg/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+				"cd ogg/build;make -j16",
+				"cp ogg/build/libogg.a ."
+			]
+		},
+		"linkFlags": []
+	},
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"mkdir include",
+		"cp -r ogg/include .",
+		"rm -rf -f ogg",
+		"rm -f libogg-1.3.6.tar.xz"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}
