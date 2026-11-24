@@ -11,7 +11,7 @@ std::filesystem::path getTempPath(const std::string& subname){
 	if(!std::filesystem::exists(subname_path))
 		std::filesystem::create_directories(subname_path);
 
-	return subname_path;
+	return std::filesystem::absolute(subname_path);
 }
 
 bool pathContainsDirectory(const std::filesystem::path& p, const std::string& dirName){

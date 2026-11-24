@@ -6,7 +6,10 @@ nlohmann::json project::serialize() const{
 	nlohmann::json output{};
 	output["name"] = name;
 	output["type"] = std::array<std::string_view, 2>{{"library", "executable"}}[(unsigned int)type];
-	output["binName"] = binName;
+	if(!binName.empty())
+		output["binName"] = binName;
+	else
+		output["binName"] = nullptr;
 	output["version"] = version;
 
 	output["source"] = norm.sourceFiles;
@@ -122,7 +125,12 @@ void project::deserialize(const nlohmann::json& j){
 		else
 			std::cerr<<"Error: unknown type \""<<typestr<<"\". Please specify either \"library\" or \"executable\""<<std::endl;
 	}
-	trySetVal(j, "binName", binName);
+	if(j.contains("binName")){
+		if(j["binName"].is_null())
+			binName = "";
+		else
+			binName = j["binName"];
+	}
 	trySetVal(j, "version", version);
 	trySetVal(j, "source", norm.sourceFiles);
 	trySetVal(j, "compileFlags", norm.compileFlags);

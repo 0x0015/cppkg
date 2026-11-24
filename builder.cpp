@@ -13,6 +13,12 @@ const std::map<osVer, std::vector<std::string>> compilerNames = {
 	{osVer{osVer::x86, osVer::Windows}, {"i686-w64-mingw32-g++"}},
 };
 
+const std::map<osVer, std::vector<std::string>> arNames = {
+	{osVer{osVer::x86_64, osVer::Linux}, {"x86_64-linux-gnu-ar"}},
+	{osVer{osVer::x86_64, osVer::Windows}, {"x86_64-w64-mingw32-ar"}},
+	{osVer{osVer::x86, osVer::Windows}, {"i686-w64-mingw32-ar"}},
+};
+
 bool builder::build(){
 	auto buildPath = getTempPath("build");
 	if(proj.extraCompileOpts.externalBuildCommand){
@@ -40,6 +46,14 @@ bool builder::build(){
 	if(!std::filesystem::exists(src_path))
 		std::filesystem::create_directories(src_path);
 
+	const auto& runInSrcPath = [&](const std::string& cmd){
+		auto oldCWD = std::filesystem::current_path();
+		std::filesystem::current_path(src_path);
+		auto retVal = system(cmd.c_str());
+		std::filesystem::current_path(oldCWD);
+		return retVal;
+	};
+
 	const auto copyReleventFile = [&](const std::filesystem::path& file){
 		auto relPath = std::filesystem::relative(file);
 		auto relPathParentFolder = relPath.parent_path();
@@ -50,7 +64,7 @@ bool builder::build(){
 	for(const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(std::filesystem::current_path())){
 		if(pathContainsDirectory(dir_entry.path(), "_cppkg"))
 			continue;
-		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".cpp" || dir_entry.path().extension() == ".c" || dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".inc")){
+		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".cpp" || dir_entry.path().extension() == ".c" || dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".inl")){
 			copyReleventFile(dir_entry.path());
 		}
 	}
@@ -62,18 +76,27 @@ bool builder::build(){
 	for(const auto& flag : proj.extraCompileOpts.compileFlags)
 		compileFlags += " " + flag;
 
+	bool isStatic = false;
 	std::string linkFlags;
-	for(const auto& flag : proj.stdCompileOpts.linkFlags)
+	for(const auto& flag : proj.stdCompileOpts.linkFlags){
 		linkFlags += " " + flag;
+		if(flag == "-static")
+			isStatic = true;
+	}
 
-	for(const auto& flag : proj.extraCompileOpts.linkFlags)
+	for(const auto& flag : proj.extraCompileOpts.linkFlags){
 		linkFlags += " " + flag;
+		if(flag == "-static")
+			isStatic = true;
+	}
 
 
-	//special case for windows executables
+	//special case for windows executables - they should always be static by default
 	//make sure to include stuff that would be shipped by default
-	if(proj.os.type == osVer::Windows && proj.type == project::EXECUTABLE)
+	if(proj.os.type == osVer::Windows && proj.type == project::EXECUTABLE){
 		linkFlags += " -static";
+		isStatic = true;
+	}
 
 
 	//technically we need to worry about link order, but let's skip that for now
@@ -85,19 +108,31 @@ bool builder::build(){
 		else
 			compileFlags += " -I" + depPath.string();
 
+		auto minimalDepProj = minimalProjectInfo(depProj, proj.mode == minimalProjectInfo::DEBUG, proj.os);
 		if(depProj.type == project::LIBRARY){
-			auto minimalDepProj = minimalProjectInfo(depProj, proj.mode == minimalProjectInfo::DEBUG, proj.os);
 			linkFlags += " -L" + depPath.string();
 			if(depProj.binName.starts_with("lib"))
 				linkFlags += " -l" + depProj.binName.substr(3);
-			else
-				linkFlags += " -l:" + minimalDepProj.getTrueBinName();
+			else if(!depProj.binName.empty())
+				linkFlags += " -l:" + (isStatic ? minimalDepProj.binName + ".a" : minimalDepProj.getTrueBinName());
 
 			for(const auto& depLinkFlag : minimalDepProj.stdCompileOpts.linkFlags)
 				linkFlags += " " + depLinkFlag;
 			for(const auto& depLinkFlag : minimalDepProj.extraCompileOpts.linkFlags)
 				linkFlags += " " + depLinkFlag;
 		}
+		const auto addCompileFlagIfRelevent = [&](const std::string& flag){
+			if(flag.find("-I") != std::string::npos || flag.find("-D") != std::string::npos)
+				compileFlags += " " + flag;
+		};
+		for(const auto& depCompileFlag : minimalDepProj.stdCompileOpts.compileFlags)
+			addCompileFlagIfRelevent(depCompileFlag);
+		for(const auto& depCompileFlag : minimalDepProj.extraCompileOpts.compileFlags)
+			addCompileFlagIfRelevent(depCompileFlag);
+	}
+
+	if(proj.type == project::LIBRARY){
+		compileFlags += " -fPIC";//make sure to add this if we're building a lib, as then we will be linking with -fPIC
 	}
 
 	const auto checkCommand = [](const std::string& command){return system((command + "  > /dev/null 2>&1").c_str()) == 0;};
@@ -143,6 +178,9 @@ bool builder::build(){
 
 	auto sourceFilesToLink = sourceFilesRemaining;
 
+	std::filesystem::path currentPath = std::filesystem::current_path();
+	std::filesystem::current_path(src_path);
+
 	std::mutex sourceFilesRemaining_mut;
 	std::atomic<bool> jobFailed = false;
 	std::string jobFailedSourceFile;
@@ -173,6 +211,8 @@ bool builder::build(){
 	for(auto& thread : workerThreads)
 		thread.join();
 
+	std::filesystem::current_path(currentPath);
+
 	if(jobFailed){
 		std::cout<<"Compilation Failed :("<<std::endl;
 		std::cout<<"Error occurred while compiling "<<jobFailedSourceFile<<std::endl;
@@ -191,17 +231,66 @@ bool builder::build(){
 		linkCommand += " " + sourceFileBuildPath.string() + ".o";
 	}
 	linkCommand += compileFlags;
-	linkCommand += " -o " + proj.getTrueBinName();
+	linkCommand += " -o " + (std::filesystem::current_path() / proj.getTrueBinName()).string();
 	linkCommand += linkFlags;
+	if(proj.type == project::LIBRARY){
+		linkCommand += " -fPIC -shared";//make sure to actually build it as a shared lib
+	}
 	std::cout<<"Link $ "<<linkCommand<<std::endl;
-	if(system((linkCommand + " > " + (buildPath/"link.log").string() + " 2>&1").c_str()) != 0){
+	if(runInSrcPath(linkCommand + " > " + (buildPath/"link.log").string() + " 2>&1") != 0){
 		std::cout<<"Linking Failed :("<<std::endl;
 		std::ifstream logFile((buildPath/"link.log").string());
 		if(logFile.is_open())
 			std::cout<<"Error log: "<<logFile.rdbuf()<<std::endl;
 		else
-			std::cout<<"Error: failed to open job build log"<<std::endl;
+			std::cout<<"Error: failed to open job link log"<<std::endl;
 		return false;
+	}
+
+	if(proj.type == project::LIBRARY){//we should also create a static version.
+		std::string ar;
+		if(proj.os == osVer::hostOsVer()){
+			if(checkCommand("ar --version"))
+				ar = "ar";
+			else{
+				std::cerr<<"Error: failed to detect ar"<<std::endl;
+				return false;
+			}
+		}else{
+			if(!arNames.contains(proj.os)){
+				std::cerr<<"Error: no known ar matches the requested OS/arch combo ("<<proj.os.createOsString()<<")"<<std::endl;
+				return false;
+			}
+			auto ars = arNames.at(proj.os);
+			for(const auto& ar_try : ars){
+				if(checkCommand(ar_try + " --version")){
+					ar = ar_try;
+					break;
+				}
+			}
+			if(ar.empty()){
+				std::cerr<<"Error: failed to detect ar"<<std::endl;
+				return false;
+			}
+		}
+
+
+		std::string arCommand = ar + " rcs " + (std::filesystem::current_path() / (proj.binName + ".a")).string();
+		for(const auto& sourceFile : sourceFilesToLink){
+			auto sourceFileBuildPath = src_path / sourceFile;
+			arCommand += " " + sourceFileBuildPath.string() + ".o";
+		}
+
+		std::cout<<"AR $ "<<arCommand<<std::endl;
+		if(runInSrcPath(arCommand + " > " + (buildPath/"ar.log").string() + " 2>&1") != 0){
+			std::cout<<"Static Lib Creation Failed :("<<std::endl;
+			std::ifstream logFile((buildPath/"ar.log").string());
+			if(logFile.is_open())
+				std::cout<<"Error log: "<<logFile.rdbuf()<<std::endl;
+			else
+				std::cout<<"Error: failed to open job ar log"<<std::endl;
+			return false;
+		}
 	}
 
 	std::cout<<"Build finished successfully :)"<<std::endl;

@@ -257,7 +257,7 @@ bool depMan::createPackage(){
 	for(const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(std::filesystem::current_path())){
 		if(pathContainsDirectory(dir_entry.path(), "_cppkg"))
 			continue;
-		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".hh" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".a" || dir_entry.path().extension() == ".lib" || dir_entry.path().extension() == ".so" || dir_entry.path().extension() == ".dll")){
+		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".hh" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".inl" || dir_entry.path().extension() == ".a" || dir_entry.path().extension() == ".lib" || dir_entry.path().extension() == ".so" || dir_entry.path().extension() == ".dll")){
 			filesToInclude.push_back(dir_entry.path());
 		}
 	}

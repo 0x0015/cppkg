@@ -151,6 +151,31 @@ int main(int argc, char** argv){
 		return clean();
 	}else if(argc == 2 && std::string_view(argv[1]) == "package"){
 		return package();
+	}else if(argc >= 2 && argc <= 4 && std::string_view(argv[1]) == "build_package"){
+		bool isDebug = true;
+		if(argc >= 3){
+			if(std::string_view(argv[2]) == "debug")
+				isDebug = true;
+			else if(std::string_view(argv[2]) == "release")
+				isDebug = false;
+			else{
+				std::cerr<<"Error: unknown parameter \""<<argv[2]<<"\""<<std::endl;
+				return(1);
+			}
+		}
+		osVer os = osVer::hostOsVer();
+		if(argc == 4){
+			auto osParsed = osVer::parseOsString(argv[3]);
+			if(!osParsed){
+				std::cout<<"Error: failed to parse os with error "<<osVer::lastOsStringParseError<<std::endl;
+				return 1;
+			}
+			os = *osParsed;
+		}
+		int buildResult = build(isDebug, os);
+		if(buildResult != 0)
+			return buildResult;
+		return package();
 	}else{
 		const auto printHelp = [](){
 			std::cout<<"cppkg v0.0.2 Options:\n\tinit - initialize an empty project in the current directory\n\tbuild - build the project in the current directory\n\tclean - clean the project in the current directory\n\tpackage - create a package .tar.xz containing the binary and header files\n\thelp (or anything else) - print this message"<<std::endl;
