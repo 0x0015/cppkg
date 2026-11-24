@@ -61,6 +61,9 @@
 		},
 		"linkFlags": []
 	},
+	"linux-x86_64":{
+		"linkFlags": ["-lasound", "-lpulse", "-lpulse-simple"]
+	},
 	"postbuildCommands":[
 		"cp -r rtaudio/*.h .",
 		"cp -r rtaudio/*.hh .",
