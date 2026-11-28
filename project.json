@@ -10,7 +10,8 @@
 		"builder.cpp",
 		"paths.cpp",
 		"json.cpp",
-		"osVer.cpp"
+		"osVer.cpp",
+		"customCommand.cpp"
 	],
 	"compileFlags": ["-std=c++20"],
 	"linkFlags": ["-lcurl", "-larchive"],
@@ -21,6 +22,6 @@
 		"compileFlags": ["-O2"]
 	},
 	"customCommands": {
-		"install": "cp cppkg /usr/local/bin"
+		"install": "cp {bin}/cppkg /usr/local/bin"
 	}
 }

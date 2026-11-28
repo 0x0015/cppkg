@@ -8,5 +8,6 @@ public:
 	bool resolveDeps();
 	std::unordered_map<std::string, project> downloadedManifests;
 	bool createPackage();
+	bool populateDependenciesToBinDir();
 };
 

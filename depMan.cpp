@@ -9,7 +9,7 @@
 #include <archive.h>
 #include <archive_entry.h>
 
-bool create_tar_xz(const std::string& outputPath, const std::vector<std::filesystem::path>& files){
+bool create_tar_xz(const std::string& outputPath, const std::vector<std::pair<std::filesystem::path, std::filesystem::path>>& files){
 	struct archive* a = archive_write_new();
 
 	archive_write_add_filter_xz(a);
@@ -21,20 +21,23 @@ bool create_tar_xz(const std::string& outputPath, const std::vector<std::filesys
 		return false;
 	}
 
-	for(const auto& path : files){
-		if(!std::filesystem::exists(path) || !std::filesystem::is_regular_file(path))
+	for(const auto& [realPath, compressedPath] : files){
+		if(!std::filesystem::exists(realPath) || !std::filesystem::is_regular_file(realPath))
 			continue;
 
 		struct archive_entry* entry = archive_entry_new();
-		archive_entry_set_pathname(entry, std::filesystem::relative(path).c_str());
-		archive_entry_set_size(entry, std::filesystem::file_size(path));
+
+		auto archivePath = compressedPath.is_absolute() ? std::filesystem::relative(compressedPath) : compressedPath;
+		auto archivePathStr = archivePath.lexically_normal().generic_string();
+		archive_entry_set_pathname(entry, archivePathStr.c_str());
+		archive_entry_set_size(entry, std::filesystem::file_size(realPath));
 		archive_entry_set_filetype(entry, AE_IFREG);
 		archive_entry_set_perm(entry, 0644);
 
 		archive_write_header(a, entry);
 
-		std::ifstream file(path.string(), std::ios::binary);
-		std::vector<uint8_t> filedata(std::filesystem::file_size(path));
+		std::ifstream file(realPath.string(), std::ios::binary);
+		std::vector<uint8_t> filedata(std::filesystem::file_size(realPath));
 		file.read((char*)filedata.data(), filedata.size());
 		archive_write_data(a, filedata.data(), filedata.size());
 		archive_entry_free(entry);
@@ -249,16 +252,24 @@ bool depMan::resolveDeps(){
 }
 
 bool depMan::createPackage(){
-	std::vector<std::filesystem::path> filesToInclude;
-	if(!std::filesystem::exists(proj.getTrueBinName())){
-		filesToInclude.push_back(std::filesystem::path(proj.getTrueBinName()));
+	std::vector<std::pair<std::filesystem::path, std::filesystem::path>> filesToInclude;
+
+	auto buildPath = getTempPath("build");
+	std::filesystem::path binPath = buildPath / "bin" / (proj.os.createOsString() + (proj.mode == minimalProjectInfo::DEBUG ? "-debug" : "-release"));
+	if(std::filesystem::exists(binPath / proj.getTrueBinName())){
+		filesToInclude.push_back({binPath / proj.getTrueBinName(), std::filesystem::path(proj.getTrueBinName())});
+	}
+	if(proj.type == project::LIBRARY){//automatically detect for the equivelent static lib
+		if(std::filesystem::exists(binPath / (proj.binName + ".a"))){
+			filesToInclude.push_back({binPath / (proj.binName + ".a"), std::filesystem::path(proj.binName + ".a")});
+		}
 	}
 	
 	for(const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(std::filesystem::current_path())){
 		if(pathContainsDirectory(dir_entry.path(), "_cppkg"))
 			continue;
 		if(dir_entry.is_regular_file() && (dir_entry.path().extension() == ".hpp" || dir_entry.path().extension() == ".h" || dir_entry.path().extension() == ".hh" || dir_entry.path().extension() == ".inc" || dir_entry.path().extension() == ".inl" || dir_entry.path().extension() == ".a" || dir_entry.path().extension() == ".lib" || dir_entry.path().extension() == ".so" || dir_entry.path().extension() == ".dll")){
-			filesToInclude.push_back(dir_entry.path());
+			filesToInclude.push_back({dir_entry.path(), dir_entry.path()});
 		}
 	}
 
@@ -266,6 +277,31 @@ bool depMan::createPackage(){
 		std::cerr<<"Error: failed to create project package archive"<<std::endl;
 		return false;
 	}
+	return true;
+}
+
+bool depMan::populateDependenciesToBinDir(){
+	if(proj.type != project::EXECUTABLE)//skip if this is a library
+		return true;
+
+	auto buildPath = getTempPath("build");
+	std::filesystem::path binPath = buildPath / "bin" / (proj.os.createOsString() + (proj.mode == minimalProjectInfo::DEBUG ? "-debug" : "-release"));
+	if(!std::filesystem::exists(binPath)){
+		std::cerr<<"Error: cannot populate dependencies into bin path - it doesn't exist!"<<std::endl;
+		return false;
+	}
+
+	for(const auto& [dep, depProj] : downloadedManifests){
+		auto depPath = getTempPath("pkg") / dep;
+
+		auto minimalDepProj = minimalProjectInfo(depProj, proj.mode == minimalProjectInfo::DEBUG, proj.os);
+		if(depProj.type == project::LIBRARY){
+			if(std::filesystem::exists(depPath / minimalDepProj.getTrueBinName())){
+				std::filesystem::copy(depPath / minimalDepProj.getTrueBinName(), binPath / minimalDepProj.getTrueBinName(), std::filesystem::copy_options::overwrite_existing);
+			}
+		}
+	}
+
 	return true;
 }
 

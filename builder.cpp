@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
+#include "customCommand.hpp"
 
 const std::map<osVer, std::vector<std::string>> compilerNames = {
 	{osVer{osVer::x86_64, osVer::Linux}, {"x86_64-linux-gnu-g++"}},
@@ -24,8 +25,8 @@ bool builder::build(){
 	if(proj.extraCompileOpts.externalBuildCommand){
 		std::cout<<"External build set, so skipping normal build and running external build command"<<std::endl;
 		for(const auto& cmd : *proj.extraCompileOpts.externalBuildCommand){
-			std::cout<<"Command $ "<<cmd<<std::endl;
-			system(cmd.c_str());
+			std::cout<<"Command $ "<<substitutePathsIntoCommand(cmd, proj)<<std::endl;
+			runCustomCommand(cmd, proj);
 		}
 		buildInfo lastBuildInfo{proj.os, proj.mode};
 		lastBuildInfo.serializeToFile((buildPath / "lastBuildInfo.json").string());
@@ -34,8 +35,8 @@ bool builder::build(){
 	if(proj.stdCompileOpts.externalBuildCommand){
 		std::cout<<"External build set, so skipping normal build and running external build command"<<std::endl;
 		for(const auto& cmd : *proj.stdCompileOpts.externalBuildCommand){
-			std::cout<<"Command $ "<<cmd<<std::endl;
-			system(cmd.c_str());
+			std::cout<<"Command $ "<<substitutePathsIntoCommand(cmd, proj)<<std::endl;
+			runCustomCommand(cmd, proj);
 		}
 		buildInfo lastBuildInfo{proj.os, proj.mode};
 		lastBuildInfo.serializeToFile((buildPath / "lastBuildInfo.json").string());
@@ -77,7 +78,7 @@ bool builder::build(){
 		compileFlags += " " + flag;
 
 	bool isStatic = false;
-	std::string linkFlags;
+	std::string linkFlags = " -Wl,-rpath,'$ORIGIN'";
 	for(const auto& flag : proj.stdCompileOpts.linkFlags){
 		linkFlags += " " + flag;
 		if(flag == "-static")
@@ -225,13 +226,17 @@ bool builder::build(){
 		return false;
 	}
 
+	std::filesystem::path binPath = buildPath / "bin" / (proj.os.createOsString() + (proj.mode == minimalProjectInfo::DEBUG ? "-debug" : "-release"));
+	if(!std::filesystem::exists(binPath))
+		std::filesystem::create_directories(binPath);
+
 	std::string linkCommand = compiler;
 	for(const auto& sourceFile : sourceFilesToLink){
 		auto sourceFileBuildPath = src_path / sourceFile;
 		linkCommand += " " + sourceFileBuildPath.string() + ".o";
 	}
 	linkCommand += compileFlags;
-	linkCommand += " -o " + (std::filesystem::current_path() / proj.getTrueBinName()).string();
+	linkCommand += " -o " + (binPath / proj.getTrueBinName()).string();
 	linkCommand += linkFlags;
 	if(proj.type == project::LIBRARY){
 		linkCommand += " -fPIC -shared";//make sure to actually build it as a shared lib
@@ -275,7 +280,7 @@ bool builder::build(){
 		}
 
 
-		std::string arCommand = ar + " rcs " + (std::filesystem::current_path() / (proj.binName + ".a")).string();
+		std::string arCommand = ar + " rcs " + (binPath / (proj.binName + ".a")).string();
 		for(const auto& sourceFile : sourceFilesToLink){
 			auto sourceFileBuildPath = src_path / sourceFile;
 			arCommand += " " + sourceFileBuildPath.string() + ".o";
