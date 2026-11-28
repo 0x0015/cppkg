@@ -16,7 +16,8 @@
 			"rm -rf ogg/build;mkdir ogg/build",
 			"cd ogg/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
 			"cd ogg/build;make -j16",
-			"cp ogg/build/libogg.so ."
+			"cp ogg/build/libogg.so .",
+			"patchelf --set-soname libogg.so libogg.so"
 		]
 	},
 	"release": {
@@ -35,7 +36,8 @@
 		"rm -rf ogg/build;mkdir ogg/build",
 		"cd ogg/build;cmake .. -DBUILD_SHARED_LIBS=ON",
 		"cd ogg/build;make -j16",
-		"cp ogg/build/libogg.so ."
+		"cp ogg/build/libogg.so .",
+		"patchelf --set-soname libogg.so libogg.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [

@@ -16,7 +16,8 @@
 			"rm -rf libremidi/build;mkdir libremidi/build",
 			"cd libremidi/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
 			"cd libremidi/build;make -j16",
-			"cp libremidi/build/liblibremidi.a ."
+			"cp libremidi/build/liblibremidi.a .",
+			"patchelf --set-soname liblibremidi.so liblibremidi.so"
 		]
 	},
 	"release": {
@@ -34,7 +35,8 @@
 		"rm -rf libremidi/build;mkdir libremidi/build",
 		"cd libremidi/build;cmake ..",
 		"cd libremidi/build;make -j16",
-		"cp libremidi/build/liblibremidi.a ."
+		"cp libremidi/build/liblibremidi.a .",
+		"patchelf --set-soname liblibremidi.so liblibremidi.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [

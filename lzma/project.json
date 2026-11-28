@@ -16,7 +16,8 @@
 			"rm -rf xz/build;mkdir xz/build",
 			"cd xz/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
 			"cd xz/build;make -j16",
-			"cp xz/build/liblzma.so ."
+			"cp xz/build/liblzma.so .",
+			"patchelf --set-soname liblzma.so liblzma.so"
 		]
 	},
 	"release": {
@@ -35,7 +36,8 @@
 		"rm -rf xz/build;mkdir xz/build",
 		"cd xz/build;cmake .. -DBUILD_SHARED_LIBS=ON",
 		"cd xz/build;make -j16",
-		"cp xz/build/liblzma.so ."
+		"cp xz/build/liblzma.so .",
+		"patchelf --set-soname liblzma.so liblzma.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [

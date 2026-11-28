@@ -16,7 +16,8 @@
 			"rm -rf kissfft/build;mkdir kissfft/build",
 			"cd kissfft/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
 			"cd kissfft/build;make -j16",
-			"cp kissfft/build/libkissfft-double.so ."
+			"cp kissfft/build/libkissfft-double.so .",
+			"patchelf --set-soname libkissfft-double.so libkissfft-double.so"
 		]
 	},
 	"release": {
@@ -34,7 +35,8 @@
 		"rm -rf kissfft/build;mkdir kissfft/build",
 		"cd kissfft/build;cmake .. -DKISSFFT_DATATYPE=double -DKISSFFT_TEST=OFF -DKISSFFT_TOOLS=OFF",
 		"cd kissfft/build;make -j16",
-		"cp kissfft/build/libkissfft-double.so ."
+		"cp kissfft/build/libkissfft-double.so .",
+		"patchelf --set-soname libkissfft-double.so libkissfft-double.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [

@@ -10,13 +10,14 @@
 		"compileFlags": ["-g", "-Wall"],
 		"externalBuildCommand": [
 			"mkdir libspatialaudio/build",
-			"cd libspatialaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+			"cd libspatialaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 			"cd libspatialaudio/build;make -j16",
 			"cp libspatialaudio/build/libspatialaudio.a .",
 			"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
-			"cd libspatialaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
+			"cd libspatialaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 			"cd libspatialaudio/build;make -j16",
-			"cp libspatialaudio/build/libspatialaudio.so ."
+			"cp libspatialaudio/build/libspatialaudio.so .",
+			"patchelf --set-soname libspatialaudio.so libspatialaudio.so"
 		]
 	},
 	"release": {
@@ -28,33 +29,34 @@
 	],
 	"externalBuildCommand": [
 		"mkdir libspatialaudio/build",
-		"cd libspatialaudio/build;cmake .. -DBUILD_SHARED_LIBS=OFF",
+		"cd libspatialaudio/build;cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 		"cd libspatialaudio/build;make -j16",
 		"cp libspatialaudio/build/libspatialaudio.a .",
 		"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
-		"cd libspatialaudio/build;cmake ..",
+		"cd libspatialaudio/build;cmake .. -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 		"cd libspatialaudio/build;make -j16",
-		"cp libspatialaudio/build/libspatialaudio.so ."
+		"cp libspatialaudio/build/libspatialaudio.so .",
+		"patchelf --set-soname libspatialaudio.so libspatialaudio.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [
 			"mkdir libspatialaudio/build",
-			"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF",
+			"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 			"cd libspatialaudio/build;make -j16",
 			"cp libspatialaudio/build/libspatialaudio.a .",
 			"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
-			"cd libspatialaudio/build;x86_64-w64-mingw32-cmake ..",
+			"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 			"cd libspatialaudio/build;make -j16",
 			"cp libspatialaudio/build/libspatialaudio.dll libspatialaudio.dll"
 		],
 		"debug":{
 			"externalBuildCommand": [
 				"mkdir libspatialaudio/build",
-				"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF",
+				"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 				"cd libspatialaudio/build;make -j16",
 				"cp libspatialaudio/build/libspatialaudio.a .",
 				"rm -rf libspatialaudio/build;mkdir libspatialaudio/build",
-				"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug",
+				"cd libspatialaudio/build;x86_64-w64-mingw32-cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DISABLE_FIND_PACKAGE_MySofa=TRUE",
 				"cd libspatialaudio/build;make -j16",
 				"cp libspatialaudio/build/libspatialaudio.dll libspatialaudio.dll"
 			]

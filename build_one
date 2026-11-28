@@ -1,0 +1,22 @@
+#!/bin/sh
+exec clang-repl --Xcc=-std=c++20 "$(tail -n +3 "$0")"
+
+#include <iostream>
+#include <filesystem>
+#include <vector>
+
+std::vector<std::string> buildTypes = {"debug linux-x86_64", "release linux-x86_64", "debug win-x86_64", "release win-x86_64"};
+for(const auto& buildType : buildTypes){
+	std::cout<<"Cleaning project."<<std::endl;
+	system("cppkg clean");
+	std::cout<<"Building project for "<<buildType<<std::endl;
+	if(system(("cppkg build " + buildType).c_str()) != 0){
+		std::cerr<<"Build failed"<<std::endl;
+		break;
+	}
+	std::cout<<"Packaging project."<<std::endl;
+	system("cppkg package");
+	std::cout<<"Cleaning project (again)."<<std::endl;
+	system("cppkg clean");
+}
+

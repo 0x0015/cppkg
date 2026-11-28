@@ -17,7 +17,10 @@
 			"rm -rf flac/build;mkdir flac/build",
 			"cd flac/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON",
 			"cd flac/build;make -j16",
-			"cp flac/build/src/libFLAC++/libFLAC++.so ."
+			"cp flac/build/src/libFLAC++/libFLAC++.so .",
+			"patchelf --set-soname libFLAC++.so libFLAC++.so",
+			"patchelf --replace-needed libogg.so.0 libogg.so libFLAC++.so",
+			"patchelf --replace-needed libFLAC.so.14 libFLAC.so libFLAC++.so"
 		]
 	},
 	"release": {
@@ -39,7 +42,10 @@
 		"rm -rf flac/build;mkdir flac/build",
 		"cd flac/build;cmake .. -DBUILD_SHARED_LIBS=ON",
 		"cd flac/build;make -j16",
-		"cp flac/build/src/libFLAC++/libFLAC++.so ."
+		"cp flac/build/src/libFLAC++/libFLAC++.so .",
+		"patchelf --set-soname libFLAC++.so libFLAC++.so",
+		"patchelf --replace-needed libogg.so.0 libogg.so libFLAC++.so",
+		"patchelf --replace-needed libFLAC.so.14 libFLAC.so libFLAC++.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [

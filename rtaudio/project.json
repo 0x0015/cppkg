@@ -16,7 +16,8 @@
 			"rm -rf rtaudio/build;mkdir rtaudio/build",
 			"cd rtaudio/build;cmake .. -DCMAKE_BUILD_TYPE=Debug -DRTAUDIO_API_JACK=OFF",
 			"cd rtaudio/build;make -j16",
-			"cp rtaudio/build/librtaudio.so ."
+			"cp rtaudio/build/librtaudio.so .",
+			"patchelf --set-soname librtaudio.so librtaudio.so"
 		]
 	},
 	"release": {
@@ -34,7 +35,8 @@
 		"rm -rf rtaudio/build;mkdir rtaudio/build",
 		"cd rtaudio/build;cmake .. -DRTAUDIO_API_JACK=OFF",
 		"cd rtaudio/build;make -j16",
-		"cp rtaudio/build/librtaudio.so ."
+		"cp rtaudio/build/librtaudio.so .",
+		"patchelf --set-soname librtaudio.so librtaudio.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [

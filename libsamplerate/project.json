@@ -16,7 +16,8 @@
 			"rm -rf libsamplerate/build;mkdir libsamplerate/build",
 			"cd libsamplerate/build;cmake .. -DCMAKE_BUILD_TYPE=Debug",
 			"cd libsamplerate/build;make -j16",
-			"cp libsamplerate/build/src/libsamplerate.a ."
+			"cp libsamplerate/build/src/libsamplerate.a .",
+			"patchelf --set-soname libsamplerate.so libsamplerate.so"
 		]
 	},
 	"release": {
@@ -34,7 +35,8 @@
 		"rm -rf libsamplerate/build;mkdir libsamplerate/build",
 		"cd libsamplerate/build;cmake ..",
 		"cd libsamplerate/build;make -j16",
-		"cp libsamplerate/build/src/libsamplerate.a ."
+		"cp libsamplerate/build/src/libsamplerate.a .",
+		"patchelf --set-soname libsamplerate.so libsamplerate.so"
 	],
 	"win-x86_64":{
 		"externalBuildCommand": [
