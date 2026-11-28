@@ -1,0 +1,29 @@
+{
+	"name": "concurrentqueue",
+	"version": "593df78",
+	"type": "library",
+	"binName": null,
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": []
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/cameron314/concurrentqueue.git",
+		"cd concurrentqueue;git checkout 593df78"
+	],
+	"externalBuildCommand": [],
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp concurrentqueue/*.h .",
+		"rm -rf -f concurrentqueue"
+	],
+	"extraCleanCommands":[
+		"rm -f *.h"
+	]
+}

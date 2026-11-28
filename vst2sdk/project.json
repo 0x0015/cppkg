@@ -1,0 +1,30 @@
+{
+	"name": "vst2sdk",
+	"version": "339d4f3",
+	"type": "library",
+	"binName": null,
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": []
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/Xaymar/vst2sdk.git",
+		"cd vst2sdk;git checkout 339d4f3"
+	],
+	"externalBuildCommand": [],
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r vst2sdk/include .",
+		"rm -rf -f vst2sdk"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

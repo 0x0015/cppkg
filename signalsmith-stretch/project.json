@@ -1,0 +1,30 @@
+{
+	"name": "signalsmith-stretch",
+	"version": "88061fd",
+	"type": "library",
+	"binName": null,
+	"source": [],
+	"compileFlags": [],
+	"linkFlags": [],
+	"debug": {
+		"compileFlags": ["-g", "-Wall"],
+		"externalBuildCommand": []
+	},
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 https://github.com/Signalsmith-Audio/signalsmith-stretch.git",
+		"cd signalsmith-stretch;git checkout 88061fd"
+	],
+	"externalBuildCommand": [],
+	"postbuildCommands":[
+		"rm -rf -f include",
+		"cp -r signalsmith-stretch/include .",
+		"rm -rf -f signalsmith-stretch"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a"
+	]
+}

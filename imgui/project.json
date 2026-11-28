@@ -1,0 +1,40 @@
+{
+	"name": "imgui",
+	"version": "144727f",
+	"type": "library",
+	"binName": "imgui",
+	"deps": ["SDL3"],
+	"source": [
+		"imgui/imgui.cpp",
+		"imgui/imgui_demo.cpp",
+		"imgui/imgui_draw.cpp",
+		"imgui/imgui_tables.cpp",
+		"imgui/imgui_widgets.cpp",
+		"imgui/backends/imgui_impl_sdl3.cpp",
+		"imgui/backends/imgui_impl_sdlgpu3.cpp",
+		"imgui/backends/imgui_impl_sdlrenderer3.cpp",
+		"imgui/misc/cpp/imgui_stdlib.cpp"
+	],
+	"compileFlags": [
+		"-Iimgui", "-DIMGUI_DEFINE_MATH_OPERATORS", "-DImDrawIdx=unsigned"
+	],
+	"linkFlags": [],
+	"release": {
+		"compileFlags": ["-O2"]
+	},
+	"prebuildCommands":[
+		"git clone --depth 1 -b docking https://github.com/ocornut/imgui.git",
+		"cd imgui;git checkout 144727f"
+	],
+	"postbuildCommands":[
+		"cp imgui/*.h .",
+		"cp imgui/backends/*.h .",
+		"cp imgui/misc/cpp/*.h .",
+		"rm -rf -f imgui"
+	],
+	"extraCleanCommands":[
+		"rm -rf -f include",
+		"rm -f *.dll *.lib *.a",
+		"rm -f *.h"
+	]
+}
