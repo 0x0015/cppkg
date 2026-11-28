@@ -15,13 +15,18 @@
 	},
 	"prebuildCommands":[
 		"git clone --depth 1 https://github.com/Signalsmith-Audio/signalsmith-stretch.git",
-		"cd signalsmith-stretch;git checkout 88061fd"
+		"cd signalsmith-stretch;git checkout 88061fd",
+		"git clone --depth 1 https://github.com/Signalsmith-Audio/linear.git",
+		"cd linear; git checkout 7bb1c8f"
 	],
 	"externalBuildCommand": [],
 	"postbuildCommands":[
 		"rm -rf -f include",
-		"cp -r signalsmith-stretch/include .",
-		"rm -rf -f signalsmith-stretch"
+		"mkdir -p include/signalsmith-stretch",
+		"mkdir -p include/signalsmith-linear",
+		"cp signalsmith-stretch/*.h include/signalsmith-stretch",
+		"cp linear/*.h include/signalsmith-linear",
+		"rm -rf -f signalsmith-stretch linear"
 	],
 	"extraCleanCommands":[
 		"rm -rf -f include",
